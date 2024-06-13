@@ -29,8 +29,24 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use((req, res, next) => {
-  res.json({ message: "express app setup" });
+app.use('/api/sauces',(req, res, next) => {
+  const sauces = [
+    {
+      "_id": "string",
+      "name": "string",
+      "manufacturer": "string",
+      "description": "string",
+      "heat": 0,
+      "likes": 0,
+      "dislikes": 0,
+      "imageUrl": "string",
+      "mainPepper": "string",
+      "usersLiked": [],
+      "usersDisliked": [],
+      "userId": "string"
+    }
+  ];
+  res.status(200).json(sauces);
 });
 
 module.exports = app;
