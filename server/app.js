@@ -3,6 +3,9 @@ const mongoose = require("mongoose");
 
 const app = express();
 
+const sauceRoutes = require("./routes/sauces");
+const userRoutes = require("./routes/user");
+app.use(express.json());
 mongoose
   .connect(
     "mongodb+srv://joshuawhite389:BDlXoTM3UdvO5cdX@cluster0.2r2plmh.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
@@ -29,24 +32,8 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/api/sauces',(req, res, next) => {
-  const sauces = [
-    {
-      "_id": "string",
-      "name": "string",
-      "manufacturer": "string",
-      "description": "string",
-      "heat": 0,
-      "likes": 0,
-      "dislikes": 0,
-      "imageUrl": "string",
-      "mainPepper": "string",
-      "usersLiked": [],
-      "usersDisliked": [],
-      "userId": "string"
-    }
-  ];
-  res.status(200).json(sauces);
-});
+app.use("/api/auth", userRoutes);
+
+// app.use('/api/sauces', sauceRoutes);
 
 module.exports = app;
