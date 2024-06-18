@@ -30,7 +30,6 @@ exports.getOneSauce = (req, res, next) => {
 exports.postSauces = (req, res, next) => {
   req.body.sauce = JSON.parse(req.body.sauce);
   const url = req.protocol + "://" + req.get("host");
-  console.log(req.body);
   const sauce = new Sauce({
     name: req.body.sauce.name,
     manufacturer: req.body.sauce.manufacturer,
@@ -40,7 +39,6 @@ exports.postSauces = (req, res, next) => {
     mainPepper: req.body.sauce.mainPepper,
     userId: req.body.sauce.userId,
   });
-  console.log(sauce);
   sauce
     .save()
     .then(() => {
