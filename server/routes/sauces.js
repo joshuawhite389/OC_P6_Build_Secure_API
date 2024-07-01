@@ -9,7 +9,7 @@ const saucesController = require("../controllers/sauces");
 router.get("/", auth, saucesController.getSauces);
 router.get("/:id", auth, saucesController.getOneSauce);
 router.post("/", auth, multer, saucesController.postSauces);
-router.put("/:id", auth, saucesController.updateSauces);
+router.put("/:id", auth, multer, saucesController.updateSauces);
 router.delete("/:id", auth, saucesController.deleteSauces);
 router.post("/:id/like", auth, saucesController.likeSauces);
 
