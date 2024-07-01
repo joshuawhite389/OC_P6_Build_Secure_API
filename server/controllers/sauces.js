@@ -1,6 +1,7 @@
 const Sauce = require("../models/sauces");
 const fs = require("fs");
 
+// Get all sauces, .find()requires no argument
 exports.getSauces = (req, res, next) => {
   Sauce.find()
     .then((sauces) => {
@@ -13,6 +14,7 @@ exports.getSauces = (req, res, next) => {
     });
 };
 
+// Get one sauce, .findOne() requires sauce id passed in the body
 exports.getOneSauce = (req, res, next) => {
   Sauce.findOne({
     _id: req.params.id,
@@ -27,8 +29,11 @@ exports.getOneSauce = (req, res, next) => {
     });
 };
 
+// Create a new sauce, get the whole body from the request, parse this into a new Sauce object
 exports.postSauces = (req, res, next) => {
+  // Data coming from front end is stringified form data, need it to be JSON
   req.body.sauce = JSON.parse(req.body.sauce);
+  // req.protocol is either http or https and req.get("host") is the domain name, localhost for this
   const url = req.protocol + "://" + req.get("host");
   const sauce = new Sauce({
     name: req.body.sauce.name,
@@ -53,6 +58,7 @@ exports.postSauces = (req, res, next) => {
     });
 };
 
+// Updating a sauce based on id passed in the body.  Essentially the same as creating a new sauce, but passing the id so we can use the update function
 exports.updateSauces = (req, res, next) => {
   let sauce = new Sauce({ _id: req.params._id });
   if (req.file) {
@@ -96,6 +102,19 @@ exports.updateSauces = (req, res, next) => {
 
 exports.deleteSauces = (req, res, next) => {
   Sauce.findOne({ _id: req.params.id }).then((sauce) => {
+    // Cannot delete a sauce that doesn't exist
+    if (!sauce) {
+      return res.status(404).json({
+        error: new Error("No such sauce"),
+      });
+    }
+    // This checks the user id added in the auth middleware to ensure the user is the owner of the sauce
+    if (sauce.userId !== req.auth.userId) {
+      return res.status(400).json({
+        error: new Error("Unauthorized request"),
+      });
+    }
+    // This deletes the image from the image folder before actually deleting the object from the database
     const filename = sauce.imageUrl.split("/images/")[1];
     fs.unlink("images/" + filename, () => {
       Sauce.deleteOne({ _id: req.params.id })
@@ -118,8 +137,8 @@ exports.deleteSauces = (req, res, next) => {
   });
 };
 
+// Like or dislike a sauce, depending on the value of the like key in the body, add the user id to the appropriate array and increment the like or dislike count
 exports.likeSauces = (req, res, next) => {
-  console.log(req.body);
   Sauce.findOne({ _id: req.params.id })
     .then((sauce) => {
       if (req.body.like === 1) {
@@ -128,7 +147,9 @@ exports.likeSauces = (req, res, next) => {
       } else if (req.body.like === -1) {
         sauce.usersDisliked.push(req.body.userId);
         sauce.dislikes += 1;
-      } else if (req.body.like === 0) {
+      }
+      // If the user has already liked or disliked the sauce, remove the user id from the appropriate array and decrement the like or dislike count
+      else if (req.body.like === 0) {
         if (sauce.usersLiked.includes(req.body.userId)) {
           sauce.usersLiked = sauce.usersLiked.filter(
             (user) => user !== req.body.userId
@@ -141,8 +162,6 @@ exports.likeSauces = (req, res, next) => {
           sauce.dislikes -= 1;
         }
       }
-      
-      console.log(sauce);
       Sauce.updateOne({ _id: req.params.id }, sauce)
         .then(() => {
           res.status(201).json({

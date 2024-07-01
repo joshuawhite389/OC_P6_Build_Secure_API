@@ -1,6 +1,9 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const path = require("path");
+const dotEnv = require("dotenv");
+
+dotEnv.config();
 
 const app = express();
 
@@ -11,7 +14,7 @@ const userRoutes = require("./routes/user");
 app.use(express.json());
 mongoose
   .connect(
-    "mongodb+srv://joshuawhite389:BDlXoTM3UdvO5cdX@cluster0.2r2plmh.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+    process.env.MONGO_DB_CONNECTION_STRING,
   )
   .then(() => {
     console.log("Successfully connected to MongoDB Atlas!");
@@ -34,7 +37,7 @@ app.use((req, res, next) => {
   );
   next();
 });
-
+// Serve static images from the images folder so express knows what to do with images
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
 app.use("/api/auth", userRoutes);
