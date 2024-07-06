@@ -100,6 +100,7 @@ exports.updateSauces = (req, res, next) => {
     });
 };
 
+//find sauce by id and delete it
 exports.deleteSauces = (req, res, next) => {
   Sauce.findOne({ _id: req.params.id }).then((sauce) => {
     // Cannot delete a sauce that doesn't exist

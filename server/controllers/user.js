@@ -2,6 +2,7 @@ const bcrypt = require("bcrypt");
 const User = require("../models/user");
 const jwt = require("jsonwebtoken");
 
+// use bcrypt to hash the password and save the user to the database
 exports.signup = (req, res, next) => {
   bcrypt.hash(req.body.password, 10).then((hash) => {
     const user = new User({
@@ -23,6 +24,7 @@ exports.signup = (req, res, next) => {
   });
 };
 
+// use bcrypt to compare the password and send a token to the user
 exports.login = (req, res, next) => {
   User.findOne({ email: req.body.email })
     .then((user) => {
